@@ -15,9 +15,9 @@ class HttpUI(QtGui.QWidget) :
 		self.initUI()
 
 	def initUI(self) :
-		vlayout = QtGui.QVBoxLayout(self)
-		tabWidget = QtGui.QTabWidget()
-		vlayout.addWidget(tabWidget)
+		Vlayout = QtGui.QVBoxLayout(self)
+		TabWidget = QtGui.QTabWidget()
+		Vlayout.addWidget(TabWidget)
 		
 		"""
 			Request Tab Begin
@@ -26,27 +26,28 @@ class HttpUI(QtGui.QWidget) :
 		RequestTab = QtGui.QWidget()
 		RequestTabLayout = QtGui.QVBoxLayout()
 		
-		
+		# Submit to Crawler
 		SubmitLayout = QtGui.QHBoxLayout() 
 		SubmitLabel = QtGui.QLabel("http://")
 		self.SubmitLineEdit = QtGui.QLineEdit("www.example.com/index.php")
 		self.SubmitPushButton = QtGui.QPushButton("Submit")
 		
+		# connect event
+		# when input element text change, then it will change, too
 		self.SubmitLineEdit.textChanged.connect(self.urlChange)
+		# click submit button, it will trigger 
 		self.SubmitPushButton.clicked.connect(self.httpRequest)
 		
 		SubmitLayout.addWidget(SubmitLabel)
-		SubmitLayout.addWidget(self.SubmitLineEdit)
+		SubmitLayout.addWidget(self.SubmitLineEdit) 
 		SubmitLayout.addWidget(self.SubmitPushButton)
 		
-		KVLayout = QtGui.QHBoxLayout()
-		self.KVKeyLineEdit= QtGui.QLineEdit("Key")
-		self.KVValueLineEdit= QtGui.QLineEdit("value")
-		self.KVPushButton = QtGui.QPushButton("add")
+		# User Agent
+		UserAgentLabel = QtGui.QLabel("User Agent")
+		UserAgentList = QtGui.QListWidget()
 		
 		RequestTabLayout.addLayout(SubmitLayout)
 		RequestTab.setLayout(RequestTabLayout)
-		tabWidget.addTab(RequestTab, "Request")
 		
 		"""
 			Request Tab End
@@ -56,7 +57,8 @@ class HttpUI(QtGui.QWidget) :
 		DOMTabLayout = QtGui.QVBoxLayout()
 		DOMTab.setLayout(DOMTabLayout)
 		
-		tabWidget.addTab(DOMTab, "DOM")
+		TabWidget.addTab(RequestTab, "Request")
+		TabWidget.addTab(DOMTab, "DOM")
 		
 		self.show()
 	
