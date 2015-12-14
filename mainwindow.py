@@ -48,9 +48,7 @@ class mainwindow(QtGui.QWidget):
 			print(self.MainWebView.page().mainFrame().childFrames())
 			
 			inputs = self.MainWebView.page().mainFrame().documentElement().findAll("input")
-			
-			test
-			
+
 			print("MainFrame Frame Name is " + self.MainWebView.page().mainFrame().frameName())
 			
 			while self.SubOtherVLayout.itemAt(0) :
