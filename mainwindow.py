@@ -52,19 +52,35 @@ class mainwindow(QtGui.QWidget):
 			print("MainFrame Frame Name is " + self.MainWebView.page().mainFrame().frameName())
 			
 			while self.SubOtherVLayout.itemAt(0) :
-				self.SubOtherVLayout.removeWidget(self.SubOtherVLayout.itemAt(0).widget())
+				widget = self.SubOtherVLayout.itemAt(0).widget()
+				self.SubOtherVLayout.removeItem(self.SubOtherVLayout.takeAt(0))
+				if widget :
+					widget.deleteLater()
+				
 			self.SubOtherVLayout.update()
 				
 			for input in inputs :
 				print((input.attribute("type"), input.attribute("name")))
-				self.SubOtherVLayout.addWidget(QtGui.QPushButton(input.attribute("type")))
+				tmpHBoxLayout = QtGui.QHBoxLayout()
+				if not input.attribute("type") == u"hidden" :
+					tmpHBoxLayout.addWidget(QtGui.QLabel(input.attribute("name")))
+					tmpHBoxLayout.addWidget(QtGui.QLineEdit(input.attribute("value")))
+					self.SubOtherVLayout.addLayout(tmpHBoxLayout)
 			
 			for frame in self.MainWebView.page().mainFrame().childFrames() : # find all child frames
 				print("Frame Name is " + frame.frameName()) # get all frames' name
 				inputs = frame.documentElement().findAll("input")
 				for input in inputs :
 					print((input.attribute("type"), input.attribute("name")))
-					self.SubOtherVLayout.addWidget(QtGui.QPushButton(frame.frameName() + " " + input.attribute("type")))
+					tmpHBoxLayout = QtGui.QHBoxLayout()
+					if input.attribute("type") == u"submit"  or input.attribute("type") == "submit":
+						self.SubOtherVLayout.addWidget(QtGui.QPushButton(input.attribute("value")))
+					elif not input.attribute("type") == u"hidden" :
+						tmpHBoxLayout.addWidget(QtGui.QLabel(input.attribute("name")))
+						tmpHBoxLayout.addWidget(QtGui.QLineEdit(input.attribute("value")))
+						self.SubOtherVLayout.addLayout(tmpHBoxLayout)
+					
+			self.SubOtherVLayout.update()
 			
 		
 	
