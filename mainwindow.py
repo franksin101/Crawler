@@ -1,8 +1,10 @@
 from PySide import QtCore
 from PySide import QtGui
 from PySide import QtWebKit
+from PySide import QtNetwork
 import gc
 import sys
+from QtHelper import QtLayoutCleanHandler
 
 class mainwindow(QtGui.QWidget):
 	def __init__(self):
@@ -10,6 +12,7 @@ class mainwindow(QtGui.QWidget):
 		self.defaultWidth = 800
 		self.defaultHeight = 600
 		self.setWindowTitle("Crawler ver 1.0.0")
+		self.webPageList = []
 		self.__initUI__()
 		pass
 		
@@ -32,8 +35,9 @@ class mainwindow(QtGui.QWidget):
 		self.MainWebView.show()
 		
 		self.MainWebView.loadFinished.connect(self.getPageData)
+		self.MainWebView.linkClicked.connect(self.clickedToNewPage)
 		
-		self.MainTabWidget.addTab(self.MainWebView, "first")
+		self.MainTabWidget.addTab(self.MainWebView, "Web View")
 		
 		self.MainHLayout.addLayout(self.SubOtherVLayout)
 		self.MainHLayout.addWidget(self.MainTabWidget)
@@ -43,28 +47,16 @@ class mainwindow(QtGui.QWidget):
 		
 	def getPageData(self, isFinished):
 		if isFinished :
-			print(self.MainWebView.page().mainFrame().toHtml().encode("utf8"))
+			#print(self.MainWebView.page().mainFrame().toHtml().encode("utf8"))
 			print(self.MainWebView.page().mainFrame().documentElement().firstChild().tagName())
 			print(self.MainWebView.page().mainFrame().childFrames())
 			
 			inputs = self.MainWebView.page().mainFrame().documentElement().findAll("input")
+			forms = self.MainWebView.page().mainFrame().documentElement().findAll("form")
 
 			print("MainFrame Frame Name is " + self.MainWebView.page().mainFrame().frameName())
 			
-			while self.SubOtherVLayout.itemAt(0) :
-				print("1....")
-				print(self.SubOtherVLayout.itemAt(0))
-				if self.SubOtherVLayout.itemAt(0) :
-					print("2....")
-					print(self.SubOtherVLayout.itemAt(0))
-					widget = self.SubOtherVLayout.itemAt(0).widget()
-					self.SubOtherVLayout.removeItem(self.SubOtherVLayout.takeAt(0))
-					print(widget)
-					if widget :
-						# self.SubOtherVLayout.removeWidget(self.SubOtherVLayout.itemAt(0).widget())
-						widget.deleteLater()
-				
-			self.SubOtherVLayout.update()
+			QtLayoutCleanHandler(self.SubOtherVLayout)
 				
 			for input in inputs :
 				print((input.attribute("type"), input.attribute("name")))
@@ -77,7 +69,7 @@ class mainwindow(QtGui.QWidget):
 					tmpHBoxLayout.addWidget(QtGui.QLineEdit(input.attribute("value")))
 					self.SubOtherVLayout.addLayout(tmpHBoxLayout)
 			
-			"""for frame in self.MainWebView.page().mainFrame().childFrames() : # find all child frames
+			for frame in self.MainWebView.page().mainFrame().childFrames() : # find all child frames
 				print("Frame Name is " + frame.frameName()) # get all frames' name
 				inputs = frame.documentElement().findAll("input")
 				for input in inputs :
@@ -89,9 +81,29 @@ class mainwindow(QtGui.QWidget):
 					elif not input.attribute("type") == u"hidden" :
 						tmpHBoxLayout.addWidget(QtGui.QLabel(input.attribute("name")))
 						tmpHBoxLayout.addWidget(QtGui.QLineEdit(input.attribute("value")))
-						self.SubOtherVLayout.addLayout(tmpHBoxLayout)"""
+						self.SubOtherVLayout.addLayout(tmpHBoxLayout)
 					
 			self.SubOtherVLayout.update()
+			
+	def clickedToNewPage(self, url) :
+		print("0.0")
+		
+		request = QtNetwork.QNetworkRequest()
+		request.setRawHeader(
+			"User-Agent",
+			"Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko"
+		);
+		request.setUrl(QtCore.QUrl(url))
+		page = QtWebkit.QWebPage()
+		self.webPageList.append(page)
+		self.MainWebView.setPage(page)
+		self.MainWebView.load(request)
+		
+		
+			
+
+
+			
 			
 		
 	
